@@ -43,7 +43,15 @@ object StreamingWithKafkaJoinedData {
       .load("./src/main/resources/sensor_field.csv")
 
     val joinedDataFrame = columnRenamedDataFrame.join(sensorMasterDataFrame, columnRenamedDataFrame("sensor_id") === sensorMasterDataFrame("sensor_id"), "left_outer")
+
     val query = joinedDataFrame.writeStream.outputMode("append").format("console").start()
+//    val query = joinedDataFrame.selectExpr("to_json(struct(*)) AS value")
+//      .writeStream.format("kafka")
+//      .option("kafka.bootstrap.servers", "192.168.100.141:9092")
+//      .option("topic", "joined-sensor-data")
+//      .option("checkpointLocation", "./src/main/scala/streaming/structured/state/JoinSensorToKafka")
+//      .start()
+
     query.awaitTermination()
   }
 
