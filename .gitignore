@@ -4,3 +4,5 @@ project/
 spark-streaming-kafka-example.iml
 target/
 data/
+checkpoint/
+src/main/scala/streaming/structured/state/

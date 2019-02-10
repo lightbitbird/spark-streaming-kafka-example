@@ -25,6 +25,7 @@ object StreamingWithKafkaJoinedData {
 
     val jsonParsedDf = stringFormatDataFrame.select(from_json($"value", schema).as("sensor_data"))
     val formattedDataFrame = jsonParsedDf.select(jsonParsedDf.col("sensor_data.id").alias("id"),
+      jsonParsedDf.col("sensor_data.date").alias("date"),
       jsonParsedDf.col("sensor_data.coord.lat").alias("lat"),
       jsonParsedDf.col("sensor_data.coord.lon").alias("lon"),
       jsonParsedDf.col("sensor_data.main.temperature").alias("temperature"),
@@ -44,13 +45,13 @@ object StreamingWithKafkaJoinedData {
 
     val joinedDataFrame = columnRenamedDataFrame.join(sensorMasterDataFrame, columnRenamedDataFrame("sensor_id") === sensorMasterDataFrame("sensor_id"), "left_outer")
 
-    val query = joinedDataFrame.writeStream.outputMode("append").format("console").start()
-//    val query = joinedDataFrame.selectExpr("to_json(struct(*)) AS value")
-//      .writeStream.format("kafka")
-//      .option("kafka.bootstrap.servers", "192.168.100.141:9092")
-//      .option("topic", "joined-sensor-data")
-//      .option("checkpointLocation", "./src/main/scala/streaming/structured/state/JoinSensorToKafka")
-//      .start()
+//    val query = joinedDataFrame.writeStream.outputMode("append").format("console").start()
+    val query = joinedDataFrame.selectExpr("to_json(struct(*)) AS value")
+      .writeStream.format("kafka")
+      .option("kafka.bootstrap.servers", "192.168.100.141:9092")
+      .option("topic", "joined-sensor-data")
+      .option("checkpointLocation", "./src/main/scala/streaming/structured/state/JoinSensorToKafka")
+      .start()
 
     query.awaitTermination()
   }
