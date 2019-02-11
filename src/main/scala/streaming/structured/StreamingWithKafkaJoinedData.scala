@@ -47,7 +47,7 @@ object StreamingWithKafkaJoinedData {
 
 //    val query = joinedDataFrame.writeStream.outputMode("append").format("console").start()
     val query = joinedDataFrame.selectExpr("to_json(struct(*)) AS value")
-      .writeStream.format("kafka")
+      .writeStream.format("kafka").outputMode("update")
       .option("kafka.bootstrap.servers", "192.168.100.141:9092")
       .option("topic", "joined-sensor-data")
       .option("checkpointLocation", "./src/main/scala/streaming/structured/state/JoinSensorToKafka")
